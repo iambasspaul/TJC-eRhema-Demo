@@ -1,0 +1,42 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.columns-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.column {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.left-column {
+  border-right: 1px solid #ccc;
+}
+
+@media (max-width: 768px) {
+  .columns-container {
+      flex-direction: column;
+  }
+
+  .column {
+      width: 100%;
+  }
+
+  .left-column {
+      border-right: none;
+      border-bottom: 1px solid #ccc;
+  }
+}
+
+.app-header {
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
