@@ -8,7 +8,7 @@ const LeftColumn = ({ onSelectVerse }) => {
 
   useEffect(() => {
     // Fetch Bible verses
-    fetch('/Bible_BSB_NT_40.json')
+    fetch('https://iambasspaul.github.io/tjc-erhema-demo/Bible_BSB_NT_40.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -29,7 +29,7 @@ const LeftColumn = ({ onSelectVerse }) => {
         });
 
     // Fetch book names
-    fetch('/book_lookup.json')
+    fetch('https://iambasspaul.github.io/tjc-erhema-demo/book_lookup.json')
         .then(response => response.json())
         .then(data => setBookNameLookup(data.fullname.bsb.en))
         .catch(error => console.error('Error fetching book lookup:', error));
@@ -44,7 +44,7 @@ const LeftColumn = ({ onSelectVerse }) => {
   
 
   return (
-      <div style={{ width: '50%', overflowY: 'scroll' }}>
+      <div style={{ width: '100%', overflowY: 'scroll' }}>
           {Object.entries(verses).map(([book, chapters]) => (
               <div key={book}>
                   <h2>Book {BookNameLookup[book] || book}</h2>

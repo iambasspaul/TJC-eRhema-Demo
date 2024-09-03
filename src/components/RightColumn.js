@@ -5,7 +5,7 @@ const RightColumn = ({ selectedWord }) => {
   const [bookLookup, setBookLookup] = useState({});
 
   useEffect(() => {
-      fetch('/book_lookup.json')
+      fetch('https://iambasspaul.github.io/tjc-erhema-demo/book_lookup.json')
           .then(response => response.json())
           .then(data => setBookLookup(data.fullname.bsb.en))
           .catch(error => console.error('Error fetching book lookup:', error));
