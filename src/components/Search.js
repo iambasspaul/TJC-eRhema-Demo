@@ -6,7 +6,7 @@ const Search = ({ onBookSelect, onClose }) => {
   useEffect(() => {
     fetch('https://iambasspaul.github.io/tjc-erhema-demo/book_list.json')
       .then(response => response.json())
-      .then(data => setBookList(data))
+      .then(data => setBookList(data.lookup.en))
       .catch(error => console.error('Error fetching book list:', error));
   }, []);
 
