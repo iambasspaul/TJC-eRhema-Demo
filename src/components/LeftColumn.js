@@ -1,78 +1,116 @@
 import React, { useEffect, useState } from 'react';
+import searchIcon from './search_icon.jpg';
 
-const LeftColumn = ({ onSelectVerse }) => {
-  const [verses, setVerses] = useState({});
-  const [selectedWord, setSelectedWord] = useState(null);
-  const [BookNameLookup, setBookNameLookup] = useState({});
-  
+const LeftColumn = ({ onVerseSelect }) => {
+  const [bookList, setBookList] = useState([]);
+  const [maxChapters, setMaxChapters] = useState({});
+  const [maxVerses, setMaxVerses] = useState({});
+  const [showBookList, setShowBookList] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [selectedVerse, setSelectedVerse] = useState(null);
+  const [verseContent, setVerseContent] = useState('');
 
   useEffect(() => {
-    // Fetch Bible verses
-    fetch('https://iambasspaul.github.io/tjc-erhema-demo/Bible_BSB_NT_40.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Ensure the data structure is as expected
-            const versesContent = data.content;
-            if (versesContent && typeof versesContent === 'object') {
-                setVerses(versesContent);
-            } else {
-                console.error('Fetched data is not in the expected format:', versesContent);
-            }
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-        });
+    // Fetch book list
+    fetch('https://iambasspaul.github.io/tjc-erhema-demo/book_list.json')
+      .then(response => response.json())
+      .then(data => {
+        const shortNames = Object.entries(data.lookup.en)
+          .filter(([_, value]) => value >= 40 && value <= 66)
+          .map(([key, _]) => key)
+          .filter(name => name.length <= 3);
+        setBookList([...new Set(shortNames)]);
+      })
+      .catch(error => console.error('Error fetching book list:', error));
 
-    // Fetch book names
+    // Fetch max chapters and verses
     fetch('https://iambasspaul.github.io/tjc-erhema-demo/book_lookup.json')
-        .then(response => response.json())
-        .then(data => setBookNameLookup(data.fullname.bsb.en))
-        .catch(error => console.error('Error fetching book lookup:', error));
-
+      .then(response => response.json())
+      .then(data => {
+        setMaxChapters(data.max_bible_chapter);
+        setMaxVerses(data.max_bible_verse);
+      })
+      .catch(error => console.error('Error fetching book lookup:', error));
   }, []);
 
-  const handleWordSelect = (wordDetails) => {
-    setSelectedWord(wordDetails);
-    onSelectVerse(wordDetails.book, wordDetails.chapter, wordDetails.verseNumber, wordDetails.strongID, wordDetails.word, wordDetails.monad);
+  const handleBookSelect = (book) => {
+    setSelectedBook(book);
+    setSelectedChapter(null);
+    setSelectedVerse(null);
+    setVerseContent('');
   };
 
-  
+  const handleChapterSelect = (chapter) => {
+    setSelectedChapter(chapter);
+    setSelectedVerse(null);
+    setVerseContent('');
+  };
+
+  const handleVerseSelect = (verse) => {
+    setSelectedVerse(verse);
+    const bookNumber = bookList.indexOf(selectedBook) + 40; // Assuming Matthew is 40
+    fetch(`https://iambasspaul.github.io/NT/Bible_BSB_NT_${bookNumber}.txt`)
+      .then(response => response.text())
+      .then(data => {
+        const lines = data.split('\n');
+        const verseContent = lines.find(line => line.startsWith(`${selectedChapter}:${verse}\t`));
+        if (verseContent) {
+          setVerseContent(verseContent.split('\t')[1]);
+          onVerseSelect(selectedBook, selectedChapter, verse, null, verseContent.split('\t')[1], null);
+        }
+      })
+      .catch(error => console.error('Error fetching verse content:', error));
+  };
 
   return (
-      <div style={{ width: '100%', overflowY: 'scroll' }}>
-          {Object.entries(verses).map(([book, chapters]) => (
-              <div key={book}>
-                  <h2>Book {BookNameLookup[book] || book}</h2>
-                  {Object.entries(chapters).map(([chapter, verses]) => (
-                      <div key={chapter}>
-                          <h3>Chapter {chapter}</h3>
-                          {Object.entries(verses).map(([verseNumber, verseArray]) => (
-                              <p key={verseNumber}>
-                                <strong>verse {verseNumber} </strong>
-                                  {verseArray.map((wordArray) => {
-                                      const [strongID, word, monad] = wordArray;
-                                      return (
-                                          <span
-                                              key={strongID}
-                                              onMouseDown={() => handleWordSelect({ book, chapter, verseNumber, strongID, word, monad })}
-                                              style={{ backgroundColor: selectedWord?.strongID === strongID ? 'yellow' : 'transparent' }}
-                                          >
-                                              {word}
-                                          </span>
-                                      );
-                                  })}
-                              </p>
-                          ))}
-                      </div>
-                  ))}
-              </div>
-          ))}
+    <div className="left-column">
+      <div className="black-bar" />
+      <div className="search-container">
+        <img 
+          src={searchIcon} 
+          alt="Search" 
+          className="search-icon"
+          onClick={() => setShowBookList(!showBookList)}
+        />
       </div>
+      {showBookList && (
+        <div className="book-list">
+          <h3>Select a Book</h3>
+          {bookList.map(book => (
+            <div key={book} onClick={() => handleBookSelect(book)} className="book-item">
+              {book}
+            </div>
+          ))}
+        </div>
+      )}
+      {selectedBook && (
+        <div className="chapter-list">
+          <h3>Select a Chapter</h3>
+          {[...Array(maxChapters[selectedBook] || 0)].map((_, i) => (
+            <span key={i + 1} onClick={() => handleChapterSelect(i + 1)} className="chapter-item">
+              {i + 1}
+            </span>
+          ))}
+        </div>
+      )}
+      {selectedChapter && (
+        <div className="verse-list">
+          <h3>Select a Verse</h3>
+          {[...Array(maxVerses[selectedBook]?.[selectedChapter] || 0)].map((_, i) => (
+            <span key={i + 1} onClick={() => handleVerseSelect(i + 1)} className="verse-item">
+              {i + 1}
+            </span>
+          ))}
+        </div>
+      )}
+      {verseContent && (
+        <div className="verse-content">
+          <h3>{`${selectedBook} ${selectedChapter}:${selectedVerse}`}</h3>
+          <p>{verseContent}</p>
+        </div>
+      )}
+    </div>
   );
 };
 
