@@ -59,12 +59,14 @@ const LeftColumn = ({ onSelectVerse }) => {
 
   return (
     <div style={{ width: '100%', overflowY: 'scroll' }}>
+      <div className="search-container">
       <img 
         src={searchIcon} 
         alt="Search" 
         className="search-icon" 
         onClick={() => setShowSearch(true)} 
       />
+      </div>
       {showSearch && <Search onBookSelect={handleBookSelect} onClose={() => setShowSearch(false)} />}
       {Object.entries(verses).map(([book, chapters]) => (
         <div key={book}>
