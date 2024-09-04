@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/tjc-erhema-demo/static/css/main.a2a6e43c.css",
-    "main.js": "/tjc-erhema-demo/static/js/main.840fb0ec.js",
+    "main.js": "/tjc-erhema-demo/static/js/main.e31826ca.js",
     "static/js/453.26855c44.chunk.js": "/tjc-erhema-demo/static/js/453.26855c44.chunk.js",
     "static/media/search_icon.jpg": "/tjc-erhema-demo/static/media/search_icon.1741075874aac7a4ac35.jpg",
     "index.html": "/tjc-erhema-demo/index.html",
     "main.a2a6e43c.css.map": "/tjc-erhema-demo/static/css/main.a2a6e43c.css.map",
-    "main.840fb0ec.js.map": "/tjc-erhema-demo/static/js/main.840fb0ec.js.map",
+    "main.e31826ca.js.map": "/tjc-erhema-demo/static/js/main.e31826ca.js.map",
     "453.26855c44.chunk.js.map": "/tjc-erhema-demo/static/js/453.26855c44.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a2a6e43c.css",
-    "static/js/main.840fb0ec.js"
+    "static/js/main.e31826ca.js"
   ]
 }
