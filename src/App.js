@@ -4,11 +4,11 @@ import LeftColumn from './components/LeftColumn';
 import RightColumn from './components/RightColumn';
 import './App.css';
 
-const App = () => {
-  const [selectedWord, setSelectedWord] = useState(null);
+function App() {
+  const [selectedWordDetails, setSelectedWordDetails] = useState(null);
 
-  const handleSelectWord = (book, chapter, verseNumber, strongID, word, monad) => {
-    setSelectedWord({ book, chapter, verseNumber, strongID, word, monad });
+  const handleWordSelect = (wordDetails) => {
+    setSelectedWordDetails(wordDetails);
   };
 
   return (
@@ -16,14 +16,14 @@ const App = () => {
       <Header />
       <div className="columns-container">
         <div className="column left-column">
-          <LeftColumn onSelectVerse={handleSelectWord} />
+          <LeftColumn onWordSelect={handleWordSelect} />
         </div>
         <div className="column right-column">
-          <RightColumn selectedWord={selectedWord} />
+          <RightColumn selectedWord={selectedWordDetails} />
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default App;

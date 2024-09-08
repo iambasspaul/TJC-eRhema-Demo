@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import SelectChapter from './SelectChapter';
 
-const Search = ({ onBookSelect, onClose }) => {
+function Search({ onSelectBook, onClose }) {
   const [bookList, setBookList] = useState({});
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     fetch('https://iambasspaul.github.io/tjc-erhema-demo/book_list.json')
@@ -10,25 +12,40 @@ const Search = ({ onBookSelect, onClose }) => {
       .catch(error => console.error('Error fetching book list:', error));
   }, []);
 
+  const handleBookClick = (bookNumber) => {
+    setSelectedBook(bookNumber);
+  };
+
   return (
-    <div className="search-popup">
-      <button onClick={onClose}>Close</button>
-      <div className="book-grid">
-        {Object.entries(bookList).map(([shortName, bookNumber]) => (
-          <div 
-            key={bookNumber} 
-            className="book-item" 
-            onClick={() => {
-              onBookSelect(bookNumber);
+    <div className="search-overlay">
+      <div className="search-popup">
+        <button onClick={onClose} className="close-button">Close</button>
+        {!selectedBook ? (
+          <div className="book-grid">
+            {Object.entries(bookList).map(([shortName, bookNumber]) => (
+              <div 
+                key={bookNumber} 
+                className="book-item" 
+                onClick={() => handleBookClick(bookNumber)}
+              >
+                {shortName}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <SelectChapter
+            book={selectedBook}
+            onSelectChapter={(chapter) => {
+              onSelectBook(selectedBook, chapter);
+              setSelectedBook(null);
               onClose();
             }}
-          >
-            {shortName}
-          </div>
-        ))}
+            onClose={() => setSelectedBook(null)}
+          />
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default Search;
