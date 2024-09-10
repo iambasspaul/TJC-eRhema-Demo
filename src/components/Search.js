@@ -35,8 +35,8 @@ function Search({ onSelectBook, onClose }) {
         ) : (
           <SelectChapter
             book={selectedBook}
-            onSelectChapter={(chapter) => {
-              onSelectBook(selectedBook, chapter);
+            onSelectChapter={(chapter, verse) => {
+              onSelectBook(selectedBook, chapter, verse);
               setSelectedBook(null);
               onClose();
             }}

@@ -9,6 +9,7 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
   const [showSearch, setShowSearch] = useState(false); // State to control search window
   const [selectedBook, setSelectedBook] = useState('40'); // Set default to Matthew (40)
   const [selectedChapter, setSelectedChapter] = useState('1'); // Set default to Chapter 1
+  const [selectedVerse, setSelectedVerse] = useState(null); // Add this line
   const [bookName, setBookName] = useState('Matthew'); // Add this line
 
   useEffect(() => {
@@ -50,15 +51,16 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
     }
   }, [selectedBook, selectedChapter, BookNameLookup]);
 
+  const handleSelectBook = (bookNumber, chapter, verse) => {
+    setSelectedBook(bookNumber);
+    setSelectedChapter(chapter);
+    setSelectedVerse(verse); // Make sure this line is present
+    setShowSearch(false); // Close the search after selection
+  };
+
   const handleWordSelect = (wordDetails) => {
     setSelectedWord(wordDetails);
     onWordSelect(wordDetails); // Pass the selected word details to the parent component
-  };
-
-  const handleSelectBook = (bookNumber, chapter) => {
-    setSelectedBook(bookNumber);
-    setSelectedChapter(chapter);
-    setShowSearch(false); // Close the search after selection
   };
 
   return (
@@ -84,7 +86,12 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
             <div key={chapter}>
               <h3>Chapter {chapter}</h3>
               {Object.entries(verses).map(([verseNumber, verseArray]) => (
-                <p key={verseNumber}>
+                <p 
+                  key={verseNumber} 
+                  style={{
+                    backgroundColor: parseInt(selectedVerse) === parseInt(verseNumber) ? 'lightgreen' : 'transparent'
+                  }}
+                >
                   <strong>verse {verseNumber} </strong>
                   {verseArray.map((wordArray, index) => {
                     const [strongID, word, monad] = wordArray;
