@@ -189,3 +189,20 @@
 }
 
 /* ... (keep other existing styles) ... */
+
+.selected-verse-display {
+  position: sticky;
+  top: 0;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  z-index: 100;
+}
+
+.selected-verse-display h4 {
+  margin: 0 0 5px 0;
+}
+
+.selected-verse-display p {
+  margin: 0;
+}

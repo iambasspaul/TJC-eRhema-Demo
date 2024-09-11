@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import searchIcon from '../assets/search_icon.jpg'; // Ensure the path is correct
 import Search from './Search'; // Import the new Search component
 
@@ -11,6 +11,13 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
   const [selectedChapter, setSelectedChapter] = useState('1'); // Set default to Chapter 1
   const [selectedVerse, setSelectedVerse] = useState(null); // Add this line
   const [bookName, setBookName] = useState('Matthew'); // Add this line
+  const selectedVerseRef = useRef(null);
+
+  const scrollToSelectedVerse = useCallback(() => {
+    if (selectedVerseRef.current) {
+      selectedVerseRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   useEffect(() => {
     // Fetch book names
@@ -29,6 +36,7 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
           if (versesContent && typeof versesContent === 'object') {
             setVerses({ [selectedBook]: { [selectedChapter]: versesContent[selectedBook][selectedChapter] } });
             setBookName(BookNameLookup[selectedBook] || `Book ${selectedBook}`);
+            console.log('Verses loaded:', selectedBook, selectedChapter);
           } else {
             console.error('Fetched data is not in the expected format:', versesContent);
           }
@@ -51,11 +59,21 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
     }
   }, [selectedBook, selectedChapter, BookNameLookup]);
 
+  useEffect(() => {
+    if (selectedVerse) {
+      // Add a small delay to ensure the verse content has been rendered
+      const timeoutId = setTimeout(scrollToSelectedVerse, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selectedVerse, scrollToSelectedVerse]);
+
   const handleSelectBook = (bookNumber, chapter, verse) => {
     setSelectedBook(bookNumber);
     setSelectedChapter(chapter);
-    setSelectedVerse(verse); // Make sure this line is present
-    setShowSearch(false); // Close the search after selection
+    setSelectedVerse(null); // Reset the selected verse
+    setShowSearch(false);
+    // Use setTimeout to ensure the verse is set after the book and chapter
+    setTimeout(() => setSelectedVerse(verse), 0);
   };
 
   const handleWordSelect = (wordDetails) => {
@@ -64,7 +82,7 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
   };
 
   return (
-    <div style={{ width: '100%', overflowY: 'scroll' }}>
+    <div style={{ width: '100%', overflowY: 'scroll' }} key={`${selectedBook}-${selectedChapter}`}>
       <div className="search-container">
       <img 
         src={searchIcon} 
@@ -79,6 +97,12 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
           onClose={() => setShowSearch(false)} 
         />
       )}
+      {selectedVerse && (
+        <div className="selected-verse-display">
+          <h4>{bookName} {selectedChapter}:{selectedVerse}</h4>
+          <p>{verses[selectedBook]?.[selectedChapter]?.[selectedVerse]?.map(([_, word]) => word).join(' ')}</p>
+        </div>
+      )}
       {Object.entries(verses).map(([book, chapters]) => (
         <div key={book}>
           <h2>{bookName}</h2>
@@ -88,6 +112,7 @@ function LeftColumn({ onWordSelect }) { // Add onWordSelect prop
               {Object.entries(verses).map(([verseNumber, verseArray]) => (
                 <p 
                   key={verseNumber} 
+                  ref={parseInt(selectedVerse) === parseInt(verseNumber) ? selectedVerseRef : null}
                   style={{
                     backgroundColor: parseInt(selectedVerse) === parseInt(verseNumber) ? 'lightgreen' : 'transparent'
                   }}
